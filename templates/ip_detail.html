@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <h1 class="display-4">IP Detail</h1>
+                <h2 class="h4">{{ ip.short_description }}</h2>
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <p><strong>Category:</strong> {{ ip.category }}</p>
+                        <p><strong>Subcategory:</strong> {{ ip.subcategory }}</p>
+                        <p><strong>Short Description:</strong> {{ ip.short_description }}</p>
+                        <p><strong>Elaborate Description:</strong> {{ ip.elaborate_description }}</p>
+                        <p><strong>Attachments:</strong> {{ ip.attachments }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

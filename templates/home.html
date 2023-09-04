@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <h1 class="display-4">Welcome to CIPR App</h1>
+                <h2 class="h4">Created IPs</h2>
+                <ul class="list-group">
+                    {% for ip in ips %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}">{{ ip.short_description }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-4">
+                    <a class="btn btn-primary" href="{{ url_for('ip_create') }}">Create IP</a>
+                    <a class="btn btn-secondary ml-2" href="{{ url_for('ip_search') }}">Search IP</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

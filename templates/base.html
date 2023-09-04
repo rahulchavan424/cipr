@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIPR</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include your custom CSS if needed -->
+    <!-- <link rel="stylesheet" href="custom.css"> -->
+    <!-- Include JavaScript libraries if needed -->
+    <!-- <script src="your-library.js"></script> -->
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">CIPR</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if session.auth_token %}
+                    <li class="nav-item">
+                        <button class="btn btn-danger" onclick="performLogout()">Logout</button>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <div class="content">
+                    {% block content %}
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <ul class="list-group">
+                                {% for message in messages %}
+                                    <li class="list-group-item">{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% endwith %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function performLogout() {
+            // AJAX request to the logout route
+            fetch("{{ url_for('logout') }}", {
+                method: "GET",
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect the user to the login page
+                    window.location.href = "{{ url_for('login') }}";
+                }
+            })
+            .catch(error => {
+                console.error("An error occurred during logout:", error);
+            });
+        }
+    </script>
+</body>
+</html>
