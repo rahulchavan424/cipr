@@ -3,6 +3,8 @@
 .flaskenv
 *.pyc
 *.pyo
+instance/
+uploads/
 cipr-venv/
 env/
 venv/
