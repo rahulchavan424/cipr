@@ -2,10 +2,36 @@
 
 {% block content %}
     <div class="container mt-4">
-        <div class="row">
+        <div class="row mt-4">
             <div class="col">
-                <h1 class="display-4">Welcome to CIPR App</h1>
-                <h2 class="h4">Created IPs</h2>
+                <h2 class="display-5">Create IP</h2>
+                <div class="mt-4">
+                    <a class="btn btn-primary" href="{{ url_for('ip_create') }}">Create</a>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col">
+                <h2 class="display-5">Search IP</h2>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        <label for="{{ form.search_query.id }}">Search:</label>
+                        {{ form.search_query(class="form-control", size=20, placeholder="Search...") }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+                <ul class="list-group mt-3">
+                    {% for ip in search_results %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}">{{ ip.short_description }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col">
                 <ul class="list-group">
                     {% for ip in ips %}
                         <li class="list-group-item">
@@ -13,12 +39,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <div class="mt-4">
-                    <a class="btn btn-primary" href="{{ url_for('ip_create') }}">Create IP</a>
-                    <a class="btn btn-secondary ml-2" href="{{ url_for('ip_search') }}">Search IP</a>
-                </div>
             </div>
         </div>
     </div>
 {% endblock %}
-

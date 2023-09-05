@@ -4,16 +4,28 @@ from forms import IPCreateForm, IPSearchForm, RegistrationForm, LoginForm
 from models import User, IP
 from auth import require_auth_token, require_role
 from roles import UserRole
+import os
+from werkzeug.utils import secure_filename
 
-@app.route('/')
+# file upload extensions
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt'}
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/', methods=['GET', 'POST'])
 @require_auth_token
 def home():
+    form = IPSearchForm()
+    search_results = []
+
     auth_token = session.get('auth_token')
     if auth_token:
         user = User.query.filter_by(auth_token=auth_token).first()
         if user:
+            search_query = form.search_query.data
+            search_results = IP.query.filter(IP.short_description.ilike(f'%{search_query}%')).all()
             ips = IP.query.all()
-            return render_template('home.html', ips=ips)
+            return render_template('home.html', form=form, ips=search_results, search_query=search_query)
     flash('You need to be logged in to access this page.', 'info')
     return redirect(url_for('login'))
 
@@ -29,8 +41,15 @@ def ip_create():
             subcategory=form.subcategory.data,
             short_description=form.short_description.data,
             elaborate_description=form.elaborate_description.data,
-            attachments=form.attachments.data,
         )
+        # handle file upload
+        attachments = []
+        for file in request.files.getlist('attachments'):
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                attachments.append(filename)
+        new_ip.attachments = ', '.join(attachments)
         db.session.add(new_ip)
         db.session.commit()
         return redirect(url_for('home'))
@@ -40,17 +59,6 @@ def ip_create():
 def ip_detail(ip_id):
     ip = IP.query.get(ip_id)
     return render_template('ip_detail.html', ip=ip)
-
-@app.route('/ip/search', methods=['GET', 'POST'])
-def ip_search():
-    form = IPSearchForm()
-    search_results = []
-
-    if form.validate_on_submit():
-        search_query = form.search_query.data
-        search_results = IP.query.filter(IP.short_description.ilike(f'%{search_query}%')).all()
-
-    return render_template('ip_search.html', form=form, search_results=search_results)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

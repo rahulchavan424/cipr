@@ -41,4 +41,3 @@ class IP(db.Model):
     short_description = db.Column(db.String(255), nullable=False)
     elaborate_description = db.Column(db.Text, nullable=False)
     attachments = db.Column(db.String(255))
-    # ... other fields

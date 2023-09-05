@@ -1,13 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, PasswordField, SelectField
+from wtforms import StringField, TextAreaField, SubmitField, PasswordField, SelectField, MultipleFileField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 class IPCreateForm(FlaskForm):
-    category = StringField('IP Category')
-    subcategory = StringField('IP Sub Category')
-    short_description = StringField('IP Short Description')
-    elaborate_description = TextAreaField('IP Elaborate Description')
-    attachments = StringField('Attachments')
+    category = StringField('IP Category', validators=[DataRequired()])
+    subcategory = StringField('IP Sub Category', validators=[DataRequired()])
+    short_description = StringField('IP Short Description', validators=[DataRequired()])
+    elaborate_description = TextAreaField('IP Elaborate Description', validators=[DataRequired()])
+    attachments = MultipleFileField('Attachments')
     submit = SubmitField('Submit')
 
 class IPSearchForm(FlaskForm):
