@@ -12,6 +12,18 @@ ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/get_subcategories', methods=['GET'])
+@require_auth_token
+def get_subcategories():
+    category = request.args.get('category')
+    subcategory_choices = []
+
+    if category:
+        # fetch subcategories based on the selected category
+        subcategory_choices = [row.subcategory for row in IP.query.filter_by(category=category).distinct().all()]
+
+    return jsonify(subcategory_choices)
+
 @app.route('/', methods=['GET', 'POST'])
 @require_auth_token
 def home():
@@ -22,12 +34,35 @@ def home():
     if auth_token:
         user = User.query.filter_by(auth_token=auth_token).first()
         if user:
+            # distinct categories from db
+            category_choices = [(row.category, row.category) for row in db.session.query(IP.category).distinct()]
+
+            category_choices.insert(0, ('', 'IP Category'))
+
+            form.category.choices = category_choices
+
+            query = IP.query
+
+            # filter by category, subcategory and search query
+            category = form.category.data
+
+            if category and category != '':
+                query = query.filter_by(category=category)
+
+                subcategory = form.subcategory.data
+                if subcategory and subcategory != '':
+                    query = query.filter_by(subcategory=subcategory)
+
             search_query = form.search_query.data
-            search_results = IP.query.filter(IP.short_description.ilike(f'%{search_query}%')).all()
-            ips = IP.query.all()
-            return render_template('home.html', form=form, ips=search_results, search_query=search_query)
+
+            if form.is_submitted() and search_query:
+                query = query.filter(IP.short_description.ilike(f'%{search_query}%'))
+                search_results = query.all()
+            return render_template('home.html', form=form, ips=search_results)
+
     flash('You need to be logged in to access this page.', 'info')
     return redirect(url_for('login'))
+
 
 @app.route('/ip/create', methods=['GET', 'POST'])
 @require_auth_token

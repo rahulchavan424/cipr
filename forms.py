@@ -12,6 +12,8 @@ class IPCreateForm(FlaskForm):
 
 class IPSearchForm(FlaskForm):
     search_query = StringField('Search', validators=[DataRequired()])
+    category = SelectField('Category')
+    subcategory = SelectField('Subcategory')
     submit = SubmitField('Search')
 
 class RegistrationForm(FlaskForm):

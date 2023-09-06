@@ -11,25 +11,34 @@
             </div>
         </div>
         <div class="row mt-4">
-            <div class="col">
+            <div class="col-md-12">
                 <h2 class="display-5">Search IP</h2>
                 <form method="POST">
                     {{ form.hidden_tag() }}
-                    <div class="form-group">
-                        <label for="{{ form.search_query.id }}">Search:</label>
-                        {{ form.search_query(class="form-control", size=20, placeholder="Search...") }}
+                    <div class="form-group row">
+                        <div class="col-md-4">
+                            <label for="{{ form.category.id }}"></label>
+                            {{ form.category(class="form-control", id="category-select") }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.subcategory.id }}"></label>
+                            <select class="form-control" id="subcategory-select" name="subcategory">
+                                <option value="">IP Subcategory</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.search_query.id }}"></label>
+                            <div class="input-group">
+                                {{ form.search_query(class="form-control", placeholder="Search...") }}
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary ml-4">Search</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
                 </form>
-                <ul class="list-group mt-3">
-                    {% for ip in search_results %}
-                        <li class="list-group-item">
-                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}">{{ ip.short_description }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
             </div>
-        </div>
+        </div>        
         <div class="row mt-4">
             <div class="col">
                 <ul class="list-group">
@@ -42,4 +51,26 @@
             </div>
         </div>
     </div>
+    <script>
+        const categorySelect = document.getElementById('category-select');
+        const subcategorySelect = document.getElementById('subcategory-select');
+
+        categorySelect.addEventListener('change', () => {
+            const selectedCategory = categorySelect.value;
+            // Send an AJAX request to fetch subcategories based on the selected category
+            fetch(`/get_subcategories?category=${selectedCategory}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing subcategory options
+                    subcategorySelect.innerHTML = '<option value="">IP Subcategory</option>';
+                    // Populate subcategory options from the response data
+                    data.forEach(subcategory => {
+                        const option = document.createElement('option');
+                        option.value = subcategory;
+                        option.textContent = subcategory;
+                        subcategorySelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
 {% endblock %}
