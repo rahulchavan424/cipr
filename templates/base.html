@@ -4,16 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CIPR</title>
+    <!-- Include Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Include your custom CSS if needed -->
-    <!-- <link rel="stylesheet" href="custom.css"> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Include your custom CSS for styling -->
+    <link rel="stylesheet" href="custom.css">
     <!-- Include JavaScript libraries if needed -->
     <!-- <script src="your-library.js"></script> -->
+    <style>
+        /* Custom CSS for styling */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f8f8;
+        }
+        .navbar {
+            background-color: #ffffff;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: #333;
+        }
+        .navbar-toggler-icon {
+            background-color: #333;
+        }
+        .navbar-nav .nav-link {
+            color: #555;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #333;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">CIPR</a>
+        <a class="navbar-brand" href="/">C-DAC Intellectual Property Repository (CIPR)</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -21,7 +54,17 @@
             <ul class="navbar-nav ml-auto">
                 {% if session.auth_token %}
                     <li class="nav-item">
-                        <button class="btn btn-danger" onclick="performLogout()">Logout</button>
+                        <a class="nav-link" href="{{ url_for('ip_create') }}"><i class="fas fa-plus"></i> Create IP</a>
+                    </li>
+                    <li class="nav-item dropdown mr-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="{{ url_for('user_profile', username=session.username) }}"><i class="fas fa-user-circle"></i> Profile</a>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" onclick="performLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </div>
                     </li>
                 {% endif %}
             </ul>
@@ -51,7 +94,7 @@
     <!-- Include Bootstrap JS and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         function performLogout() {

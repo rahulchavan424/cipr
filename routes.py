@@ -1,11 +1,12 @@
 from flask import render_template, url_for, redirect, flash, request, session, jsonify
 from app import app, db
-from forms import IPCreateForm, IPSearchForm, RegistrationForm, LoginForm
+from forms import IPCreateForm, IPSearchForm, RegistrationForm, LoginForm, UserProfileForm
 from models import User, IP
 from auth import require_auth_token, require_role
 from roles import UserRole
 import os
 from werkzeug.utils import secure_filename
+from sqlalchemy import desc
 
 # file upload extensions
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt'}
@@ -29,23 +30,19 @@ def get_subcategories():
 def home():
     form = IPSearchForm()
     search_results = []
-
     auth_token = session.get('auth_token')
+
     if auth_token:
         user = User.query.filter_by(auth_token=auth_token).first()
+
         if user:
-            # distinct categories from db
             category_choices = [(row.category, row.category) for row in db.session.query(IP.category).distinct()]
-
             category_choices.insert(0, ('', 'IP Category'))
-
             form.category.choices = category_choices
 
-            query = IP.query
+            query = IP.query.order_by(desc(IP.id)) 
 
-            # filter by category, subcategory and search query
             category = form.category.data
-
             if category and category != '':
                 query = query.filter_by(category=category)
 
@@ -57,7 +54,10 @@ def home():
 
             if form.is_submitted() and search_query:
                 query = query.filter(IP.short_description.ilike(f'%{search_query}%'))
-                search_results = query.all()
+
+            # limit query results
+            search_results = query.limit(5).all()
+            
             return render_template('home.html', form=form, ips=search_results)
 
     flash('You need to be logged in to access this page.', 'info')
@@ -112,6 +112,7 @@ def login():
             # generate and store authentication token
             auth_token = user.generate_auth_token()
             session['auth_token'] = auth_token
+            session['username'] = username
 
             return redirect(url_for('home'))
         else:
@@ -160,3 +161,35 @@ def register():
         return redirect(url_for('login'))
     
     return render_template('register.html', form=form)
+
+@app.route('/user_profile/<username>', methods=['GET', 'POST'])
+@require_auth_token
+def user_profile(username):
+    user = User.query.filter_by(username=username).first()
+    if user:
+        form = UserProfileForm()
+
+        if form.validate_on_submit():
+            # Handle the form submission and update the user's profile data
+            user.description = form.description.data
+
+            # Handle profile picture upload
+            if form.profile_picture.data:
+                profile_picture = form.profile_picture.data
+                if allowed_file(profile_picture.filename):
+                    filename = secure_filename(profile_picture.filename)
+                    file_path = os.path.join(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], filename)
+                    profile_picture.save(file_path)
+                    user.profile_picture = file_path  # Save the file path to the user's profile_picture field
+
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('user_profile', username=username))
+
+        # Pre-fill the form with the user's current profile data
+        form.description.data = user.description
+
+        return render_template('user_profile.html', form=form, user=user)
+    else:
+        flash('User not found.', 'error')
+        return redirect(url_for('home'))

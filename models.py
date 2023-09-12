@@ -18,6 +18,10 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     auth_token = db.Column(db.String(32), unique=True, nullable=True)
+
+    # profile fields
+    profile_picture = db.Column(db.String(255))
+    description = db.Column(db.Text)
     
     def __init__(self, username, email, role, password):
         self.username = username

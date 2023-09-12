@@ -3,14 +3,6 @@
 {% block content %}
     <div class="container mt-4">
         <div class="row mt-4">
-            <div class="col">
-                <h2 class="display-5">Create IP</h2>
-                <div class="mt-4">
-                    <a class="btn btn-primary" href="{{ url_for('ip_create') }}">Create</a>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-4">
             <div class="col-md-12">
                 <h2 class="display-5">Search IP</h2>
                 <form method="POST">
@@ -41,15 +33,36 @@
         </div>        
         <div class="row mt-4">
             <div class="col">
-                <ul class="list-group">
-                    {% for ip in ips %}
-                        <li class="list-group-item">
-                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}">{{ ip.short_description }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Category</th>
+                            <th>Subcategory</th>
+                            <th>Short Description</th>
+                            <th>Detailed Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if ips %}
+                            {% for ip in ips %}
+                                <tr>
+                                    <td>{{ ip.category }}</td>
+                                    <td>{{ ip.subcategory }}</td>
+                                    <td>
+                                        <a href="{{ url_for('ip_detail', ip_id=ip.id) }}">{{ ip.short_description }}</a>
+                                    </td>
+                                    <td>{{ ip.elaborate_description }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No IPs found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </div>        
     </div>
     <script>
         const categorySelect = document.getElementById('category-select');

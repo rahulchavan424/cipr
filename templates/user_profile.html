@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+      <!-- Profile Picture -->
+      <div class="profile-picture">
+        <img src="{{ user.profile_picture }}" alt="{{ user.username }}">
+      </div>
+    </div>
+    <div class="col-md-9">
+      <!-- Navigation Bar for Sections -->
+      <ul class="nav nav-tabs" id="profileTabs">
+        <li class="nav-item">
+          <a class="nav-link active" id="overview-tab" data-toggle="tab" href="#overview">Overview</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="skills-tab" data-toggle="tab" href="#skills">Skills</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="research-tab" data-toggle="tab" href="#research">Research Info</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="ips-tab" data-toggle="tab" href="#published-ips">Published IPs</a>
+        </li>
+      </ul>
+
+      <!-- Content for Each Section -->
+      <div class="tab-content" id="profileTabsContent">
+        <!-- Overview Section -->
+        <div class="tab-pane fade show active" id="overview">
+          <h2>Department: {{ user.department }}</h2>
+          <!-- List of IPs (Table Format) -->
+          <h3>List of IPs</h3>
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <!-- Add more table headers if needed -->
+              </tr>
+            </thead>
+            <tbody>
+              {% for ip in user.ips %}
+              <tr>
+                <td>{{ ip.title }}</td>
+                <td>{{ ip.category }}</td>
+                <!-- Add more table data if needed -->
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <!-- List of Notifications -->
+          <h3>Notifications</h3>
+          <!-- Add notifications content here -->
+        </div>
+
+        <!-- Skills Section (Add content here) -->
+        <div class="tab-pane fade" id="skills">
+          <!-- Add skills content here -->
+        </div>
+
+        <!-- Research Info Section (Add content here) -->
+        <div class="tab-pane fade" id="research">
+          <!-- Add research info content here -->
+        </div>
+
+        <!-- Published IPs Section (Add content here) -->
+        <div class="tab-pane fade" id="published-ips">
+          <!-- Add published IPs content here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

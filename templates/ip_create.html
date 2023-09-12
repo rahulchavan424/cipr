@@ -8,19 +8,19 @@
                 <form method="POST" enctype="multipart/form-data" class="mt-3">
                     {{ form.hidden_tag() }}
                     <div class="form-group">
-                        <label for="{{ form.category.id }}">Category:</label>
+                        <label for="{{ form.category.id }}">Category*:</label>
                         {{ form.category(class="form-control") }}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.subcategory.id }}">Subcategory:</label>
+                        <label for="{{ form.subcategory.id }}">Subcategory*:</label>
                         {{ form.subcategory(class="form-control") }}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.short_description.id }}">Short Description:</label>
+                        <label for="{{ form.short_description.id }}">Short Description*:</label>
                         {{ form.short_description(class="form-control") }}
                     </div>
                     <div class="form-group">
-                        <label for="{{ form.elaborate_description.id }}">Elaborate Description:</label>
+                        <label for="{{ form.elaborate_description.id }}">Elaborate Description*:</label>
                         {{ form.elaborate_description(class="form-control") }}
                     </div>
                     <div class="form-group">

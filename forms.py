@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, PasswordField, SelectField, MultipleFileField
+from wtforms import StringField, TextAreaField, SubmitField, PasswordField, SelectField, MultipleFileField, FileField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 class IPCreateForm(FlaskForm):
@@ -30,8 +30,12 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class UserProfileForm(FlaskForm):
+    profile_picture = FileField('Profile Picture')
+    description = TextAreaField('Description', validators=[DataRequired()])
+    submit = SubmitField('Save Profile')
