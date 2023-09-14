@@ -70,14 +70,23 @@ def home():
 def ip_create():
     form = IPCreateForm()
     if form.validate_on_submit():
-        # create new ip instance and add to db
+        # Get the email address of the logged-in user from the session
+        user_email = session.get('email')
+
+        if not user_email:
+            flash('User email not found. Please log in.', 'error')
+            return redirect(url_for('login'))
+
+        # Create a new IP instance and add it to the database
         new_ip = IP(
             category=form.category.data,
             subcategory=form.subcategory.data,
             short_description=form.short_description.data,
             elaborate_description=form.elaborate_description.data,
+            user_email=user_email,  # Store the email address in the IP record
         )
-        # handle file upload
+
+        # Handle file upload
         attachments = []
         for file in request.files.getlist('attachments'):
             if file and allowed_file(file.filename):
@@ -85,9 +94,12 @@ def ip_create():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 attachments.append(filename)
         new_ip.attachments = ', '.join(attachments)
+
         db.session.add(new_ip)
         db.session.commit()
+        flash('IP created successfully!', 'success')
         return redirect(url_for('home'))
+
     return render_template('ip_create.html', form=form)
 
 @app.route('/ip/<int:ip_id>')
@@ -98,27 +110,27 @@ def ip_detail(ip_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    
+
     if form.validate_on_submit():
-        username = form.username.data
+        email = form.email.data
         password = form.password.data
-        
-        user = User.query.filter_by(username=username).first()
+
+        user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
-            # successful login
+            # Successful login
             print("Successful login!")
             flash('Login successful!', 'success')
 
-            # generate and store authentication token
+            # Generate and store authentication token
             auth_token = user.generate_auth_token()
             session['auth_token'] = auth_token
-            session['username'] = username
+            session['email'] = email
 
             return redirect(url_for('home'))
         else:
-            # failed login
-            flash('Invalid username or password', 'error')
-    
+            # Failed login
+            flash('Invalid email or password', 'error')
+
     return render_template('login.html', form=form)
 
 @app.route('/logout')
@@ -162,10 +174,10 @@ def register():
     
     return render_template('register.html', form=form)
 
-@app.route('/user_profile/<username>', methods=['GET', 'POST'])
+@app.route('/user_profile/<email>', methods=['GET', 'POST'])
 @require_auth_token
-def user_profile(username):
-    user = User.query.filter_by(username=username).first()
+def user_profile(email):
+    user = User.query.filter_by(email=email).first()
     if user:
         form = UserProfileForm()
 
@@ -178,13 +190,15 @@ def user_profile(username):
                 profile_picture = form.profile_picture.data
                 if allowed_file(profile_picture.filename):
                     filename = secure_filename(profile_picture.filename)
-                    file_path = os.path.join(app.config['PROFILE_PICTURE_UPLOAD_FOLDER'], filename)
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     profile_picture.save(file_path)
-                    user.profile_picture = file_path  # Save the file path to the user's profile_picture field
+                    
+                    # Save the file path to the user's profile_picture field in the database
+                    user.profile_picture = file_path
 
             db.session.commit()
             flash('Profile updated successfully!', 'success')
-            return redirect(url_for('user_profile', username=username))
+            return redirect(url_for('user_profile', email=email))
 
         # Pre-fill the form with the user's current profile data
         form.description.data = user.description

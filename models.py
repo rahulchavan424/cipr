@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 from sqlalchemy_utils import ChoiceType
 from roles import UserRole
+from sqlalchemy.orm import relationship
 
 class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
@@ -18,10 +19,9 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     auth_token = db.Column(db.String(32), unique=True, nullable=True)
-
-    # profile fields
     profile_picture = db.Column(db.String(255))
     description = db.Column(db.Text)
+    ips = relationship('IP', back_populates='user')
     
     def __init__(self, username, email, role, password):
         self.username = username
@@ -45,3 +45,5 @@ class IP(db.Model):
     short_description = db.Column(db.String(255), nullable=False)
     elaborate_description = db.Column(db.Text, nullable=False)
     attachments = db.Column(db.String(255))
+    user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
+    user = relationship('User', back_populates='ips')

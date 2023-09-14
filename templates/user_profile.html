@@ -6,8 +6,16 @@
     <div class="col-md-3">
       <!-- Profile Picture -->
       <div class="profile-picture">
-        <img src="{{ user.profile_picture }}" alt="{{ user.username }}">
-      </div>
+        <img src="{{ user.profile_picture }}" alt="{{ user.email }}">
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('user_profile', email=user.email) }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group mt-2">
+                <label for="{{ form.profile_picture.id }}">Upload Profile Picture:</label>
+                {{ form.profile_picture(class="form-control-file") }}
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
     </div>
     <div class="col-md-9">
       <!-- Navigation Bar for Sections -->
@@ -44,7 +52,7 @@
             <tbody>
               {% for ip in user.ips %}
               <tr>
-                <td>{{ ip.title }}</td>
+                <td>{{ ip.short_description }}</td>
                 <td>{{ ip.category }}</td>
                 <!-- Add more table data if needed -->
               </tr>

@@ -2,32 +2,32 @@
 
 {% block content %}
     <div class="container mt-4">
-        <div class="row">
-            <div class="col">
-                <h1 class="display-4">Create New IP</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h1 class="display-5">Create New IP</h1>
                 <form method="POST" enctype="multipart/form-data" class="mt-3">
                     {{ form.hidden_tag() }}
                     <div class="form-group">
                         <label for="{{ form.category.id }}">Category*:</label>
-                        {{ form.category(class="form-control") }}
+                        {{ form.category(class="form-control form-control-lg") }}
                     </div>
                     <div class="form-group">
                         <label for="{{ form.subcategory.id }}">Subcategory*:</label>
-                        {{ form.subcategory(class="form-control") }}
+                        {{ form.subcategory(class="form-control form-control-lg") }}
                     </div>
                     <div class="form-group">
                         <label for="{{ form.short_description.id }}">Short Description*:</label>
-                        {{ form.short_description(class="form-control") }}
+                        {{ form.short_description(class="form-control form-control-lg") }}
                     </div>
                     <div class="form-group">
                         <label for="{{ form.elaborate_description.id }}">Elaborate Description*:</label>
-                        {{ form.elaborate_description(class="form-control") }}
+                        {{ form.elaborate_description(class="form-control form-control-lg") }}
                     </div>
                     <div class="form-group">
                         <label for="{{ form.attachments.id }}">Attachments:</label>
-                        {{ form.attachments(class="form-control", type="file", multiple="multiple") }}
+                        {{ form.attachments(class="form-control form-control-lg", type="file", multiple="multiple") }}
                     </div>
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Create</button>
                 </form>
             </div>
         </div>

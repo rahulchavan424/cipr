@@ -61,7 +61,7 @@
                             <i class="fas fa-user"></i>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="{{ url_for('user_profile', username=session.username) }}"><i class="fas fa-user-circle"></i> Profile</a>
+                            <a class="dropdown-item" href="{{ url_for('user_profile', email=session.email) }}"><i class="fas fa-user-circle"></i> Profile</a>
                             <div class="dropdown-divider"></div>
                             <button class="dropdown-item" onclick="performLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                         </div>
