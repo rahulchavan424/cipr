@@ -6,7 +6,11 @@
     <div class="col-md-3">
       <!-- Profile Picture -->
       <div class="profile-picture">
-        <img src="{{ user.profile_picture }}" alt="{{ user.email }}">
+        {% if user.profile_picture %}
+          <img src="{{ url_for('static', filename=user.profile_picture) }}" class="img-thumbnail">
+        {% else %}
+          <img src="{{ url_for('static', filename='default.jpg') }}" class="img-thumbnail" >
+        {% endif %}
         <form method="POST" enctype="multipart/form-data" action="{{ url_for('user_profile', email=user.email) }}">
             {{ form.hidden_tag() }}
             <div class="form-group mt-2">
@@ -15,7 +19,7 @@
             </div>
             <button type="submit" class="btn btn-primary">Upload</button>
         </form>
-    </div>
+      </div>
     </div>
     <div class="col-md-9">
       <!-- Navigation Bar for Sections -->
@@ -38,15 +42,14 @@
       <div class="tab-content" id="profileTabsContent">
         <!-- Overview Section -->
         <div class="tab-pane fade show active" id="overview">
-          <h2>Department: {{ user.department }}</h2>
+          <h2 class="mt-4">Department: Cybersecurity and Forensics</h2>
           <!-- List of IPs (Table Format) -->
-          <h3>List of IPs</h3>
+          <h3 class="mt-4">IPs Created</h3>
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th>Title</th>
                 <th>Category</th>
-                <!-- Add more table headers if needed -->
               </tr>
             </thead>
             <tbody>
@@ -54,32 +57,55 @@
               <tr>
                 <td>{{ ip.short_description }}</td>
                 <td>{{ ip.category }}</td>
-                <!-- Add more table data if needed -->
               </tr>
               {% endfor %}
             </tbody>
           </table>
           <!-- List of Notifications -->
-          <h3>Notifications</h3>
-          <!-- Add notifications content here -->
+          <h3 class="mt-4">Notifications</h3>
+          <div class="alert alert-info">
+            You have 3 new notifications.
+          </div>
         </div>
 
-        <!-- Skills Section (Add content here) -->
+        <!-- Skills Section -->
         <div class="tab-pane fade" id="skills">
-          <!-- Add skills content here -->
+          <h2 class="mt-4">Skills</h2>
+          <ul class="list-group">
+            <li class="list-group-item">Programming: Python, JavaScript</li>
+            <li class="list-group-item">Data Analysis: SQL, Pandas</li>
+            <li class="list-group-item">Web Development: Flask, React</li>
+          </ul>
         </div>
 
-        <!-- Research Info Section (Add content here) -->
+        <!-- Research Info Section -->
         <div class="tab-pane fade" id="research">
-          <!-- Add research info content here -->
+          <h2 class="mt-4">Research Info</h2>
+          <p>As a dedicated researcher, I have been exploring the fascinating world of artificial intelligence and its applications in healthcare.
+            My recent research focuses on leveraging machine learning algorithms to predict disease outbreaks based on epidemiological data.
+            Through extensive data analysis and model development, I aim to contribute to early disease detection and prevention strategies.
+            I am also passionate about natural language processing (NLP) and its potential to revolutionize the healthcare industry.</p>
         </div>
 
-        <!-- Published IPs Section (Add content here) -->
+        <!-- Published IPs Section -->
         <div class="tab-pane fade" id="published-ips">
-          <!-- Add published IPs content here -->
+          <h2 class="mt-4">Published IPs</h2>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Invention: Smart Home Automation</h5>
+              <p class="card-text">Category: IoT</p>
+            </div>
+          </div>
+          <div class="card mt-3">
+            <div class="card-body">
+              <h5 class="card-title">Software: Inventory Management System</h5>
+              <p class="card-text">Category: Business</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
+

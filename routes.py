@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import desc
 
 # file upload extensions
-ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt'}
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -180,21 +180,22 @@ def user_profile(email):
     user = User.query.filter_by(email=email).first()
     if user:
         form = UserProfileForm()
-
-        if form.validate_on_submit():
-            # Handle the form submission and update the user's profile data
-            user.description = form.description.data
-
-            # Handle profile picture upload
-            if form.profile_picture.data:
-                profile_picture = form.profile_picture.data
-                if allowed_file(profile_picture.filename):
-                    filename = secure_filename(profile_picture.filename)
-                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    profile_picture.save(file_path)
-                    
-                    # Save the file path to the user's profile_picture field in the database
-                    user.profile_picture = file_path
+        
+        # Handle the form submission and update the user's profile data
+        user.description = form.description.data
+        
+        # Handle profile picture upload
+        if form.profile_picture.data:
+            print("profile ke logic me aaya")
+            profile_picture = form.profile_picture.data
+            print("profile picture ka data", profile_picture)
+            if allowed_file(profile_picture.filename):
+                filename = secure_filename(profile_picture.filename)
+                file_path = os.path.join(app.config['IMAGE_FOLDER'], filename)
+                profile_picture.save(file_path)
+                
+                # Save the file path to the user's profile_picture field in the database
+                user.profile_picture = filename
 
             db.session.commit()
             flash('Profile updated successfully!', 'success')
