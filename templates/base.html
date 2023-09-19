@@ -4,48 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CIPR</title>
-    <!-- Include Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Include Satoshi Font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Satoshi&display=swap" rel="stylesheet">
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Include Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Include your custom CSS for styling -->
     <link rel="stylesheet" href="custom.css">
-    <!-- Include JavaScript libraries if needed -->
-    <!-- <script src="your-library.js"></script> -->
+    <!-- Include Particles.js library -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
-        /* Custom CSS for styling */
         body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f8f8f8;
+            font-family: 'Satoshi', sans-serif;
+            background-color: #0d1117; 
+            margin: 0;
+            color: #c9d1d9; 
         }
         .navbar {
-            background-color: #ffffff;
+            background-color: #0d1117; 
         }
         .navbar-brand {
             font-weight: 700;
-            color: #333;
+            color: #f0f6fc; 
+        }
+        .navbar-brand:hover {
+            color: #ff5733; 
         }
         .navbar-toggler-icon {
-            background-color: #333;
+            background-color: #f0f6fc; 
         }
         .navbar-nav .nav-link {
-            color: #555;
+            color: #c9d1d9; 
         }
         .navbar-nav .nav-link:hover {
-            color: #333;
+            color: #f0f6fc; 
+        }
+        .dropdown-menu a.dropdown-item:hover {
+            color: #ff5733; 
+        }
+        .dropdown-menu button.dropdown-item:hover {
+            color: #ff5733; 
         }
         .content {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.1); 
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease; 
+        }
+        ::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1; 
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div id="particles-js"></div> <!-- Particle animation container -->
+    <nav class="navbar navbar-expand-lg">
         <a class="navbar-brand" href="/">C-DAC Intellectual Property Repository (CIPR)</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -95,8 +127,121 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
+    <!-- Particle animation script -->
     <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: {
+                    value: 100,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: "#fff"
+                },
+                shape: {
+                    type: "circle",
+                    stroke: {
+                        width: 0,
+                        color: "#000000"
+                    },
+                    polygon: {
+                        nb_sides: 5
+                    },
+                    image: {
+                        src: "img/github.svg",
+                        width: 100,
+                        height: 100
+                    }
+                },
+                opacity: {
+                    value: 0.5,
+                    random: false,
+                    anim: {
+                        enable: false,
+                        speed: 1,
+                        opacity_min: 0.1,
+                        sync: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: false,
+                        speed: 40,
+                        size_min: 0.1,
+                        sync: false
+                    }
+                },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#fff",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 3,
+                    direction: "none",
+                    random: false,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false,
+                    attract: {
+                        enable: false,
+                        rotateX: 600,
+                        rotateY: 1200
+                    }
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: {
+                        enable: true,
+                        mode: "repulse"
+                    },
+                    onclick: {
+                        enable: true,
+                        mode: "push"
+                    },
+                    resize: true
+                },
+                modes: {
+                    grab: {
+                        distance: 400,
+                        line_linked: {
+                            opacity: 1
+                        }
+                    },
+                    bubble: {
+                        distance: 400,
+                        size: 40,
+                        duration: 2,
+                        opacity: 8,
+                        speed: 3
+                    },
+                    repulse: {
+                        distance: 200,
+                        duration: 0.4
+                    },
+                    push: {
+                        particles_nb: 4
+                    },
+                    remove: {
+                        particles_nb: 2
+                    }
+                }
+            },
+            retina_detect: true
+        });
+
         function performLogout() {
             // AJAX request to the logout route
             fetch("{{ url_for('logout') }}", {
@@ -114,5 +259,44 @@
             });
         }
     </script>
+
+    <script>
+        // Function to create a bounce animation for navbar items
+        function animateNavbarItems() {
+            const navbarItems = document.querySelectorAll('.navbar-nav .nav-link');
+    
+            // Define the animation properties
+            anime({
+                targets: navbarItems,
+                translateY: [-10, 0],
+                opacity: [0, 1],
+                delay: anime.stagger(100), // Delay each item
+                easing: 'easeOutElastic', // Easing function for bounce effect
+            });
+        }
+    
+        // Add hover animation for navbar items
+        const navbarLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        navbarLinks.forEach((link) => {
+            link.addEventListener('mouseenter', () => {
+                anime({
+                    targets: link,
+                    color: '#ff5733', // Change to a different color on hover
+                    duration: 200,
+                });
+            });
+    
+            link.addEventListener('mouseleave', () => {
+                anime({
+                    targets: link,
+                    color: '#c9d1d9', // Change back to the original color
+                    duration: 200,
+                });
+            });
+        });
+    
+        // Call the animation function when the page loads
+        window.addEventListener('load', animateNavbarItems);
+    </script>    
 </body>
 </html>

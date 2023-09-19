@@ -4,9 +4,9 @@
     <div class="container mt-4">
         <div class="row">
             <div class="col">
-                <h1 class="display-4">IP Detail</h1>
-                <h2 class="h4">{{ ip.short_description }}</h2>
-                <div class="card mt-3">
+                <h1 class="display-4 text-light">IP Detail</h1>
+                <h2 class="h4 text-light">{{ ip.short_description }}</h2>
+                <div class="card mt-3 bg-transparent text-light">
                     <div class="card-body">
                         <p><strong>Category:</strong> {{ ip.category }}</p>
                         <p><strong>Subcategory:</strong> {{ ip.subcategory }}</p>
@@ -19,3 +19,4 @@
         </div>
     </div>
 {% endblock %}
+

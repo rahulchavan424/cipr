@@ -9,21 +9,21 @@
                     {{ form.hidden_tag() }}
                     <div class="form-group row">
                         <div class="col-md-4">
-                            <label for="{{ form.category.id }}"></label>
+                            <label for="{{ form.category.id }}" class="text-light">Category</label>
                             {{ form.category(class="form-control", id="category-select") }}
                         </div>
                         <div class="col-md-4">
-                            <label for="{{ form.subcategory.id }}"></label>
+                            <label for="{{ form.subcategory.id }}" class="text-light">Subcategory</label>
                             <select class="form-control" id="subcategory-select" name="subcategory">
                                 <option value="">IP Subcategory</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="{{ form.search_query.id }}"></label>
+                            <label for="{{ form.search_query.id }}" class="text-light">Search Query</label>
                             <div class="input-group">
                                 {{ form.search_query(class="form-control", placeholder="Search...") }}
                                 <div class="input-group-append">
-                                    <button type="submit" class="btn btn-primary ml-4">Search</button>
+                                    <button type="submit" class="btn btn-outline-light ml-4">Search</button>
                                 </div>
                             </div>
                         </div>
@@ -33,8 +33,8 @@
         </div>        
         <div class="row mt-4">
             <div class="col">
-                <table class="table table-bordered table-striped table-hover">
-                    <thead class="thead-light">
+                <table class="table table-bordered table-striped text-light">
+                    <thead class="thead-dark">
                         <tr>
                             <th>Category</th>
                             <th>Subcategory</th>
@@ -49,7 +49,7 @@
                                     <td>{{ ip.category }}</td>
                                     <td>{{ ip.subcategory }}</td>
                                     <td>
-                                        <a href="{{ url_for('ip_detail', ip_id=ip.id) }}">{{ ip.short_description }}</a>
+                                        <a href="{{ url_for('ip_detail', ip_id=ip.id) }}" class="text-light">{{ ip.short_description }}</a>
                                     </td>
                                     <td>{{ ip.elaborate_description }}</td>
                                 </tr>

@@ -9,15 +9,15 @@
         {% if user.profile_picture %}
           <img src="{{ url_for('static', filename=user.profile_picture) }}" class="img-thumbnail">
         {% else %}
-          <img src="{{ url_for('static', filename='default.jpg') }}" class="img-thumbnail" >
+          <img src="{{ url_for('static', filename='default.jpg') }}" class="img-thumbnail">
         {% endif %}
         <form method="POST" enctype="multipart/form-data" action="{{ url_for('user_profile', email=user.email) }}">
             {{ form.hidden_tag() }}
             <div class="form-group mt-2">
-                <label for="{{ form.profile_picture.id }}">Upload Profile Picture:</label>
+                <label for="{{ form.profile_picture.id }}" class="text-light">Upload Profile Picture:</label>
                 {{ form.profile_picture(class="form-control-file") }}
             </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
+            <button type="submit" class="btn btn-outline-light">Upload</button>
         </form>
       </div>
     </div>
@@ -25,16 +25,16 @@
       <!-- Navigation Bar for Sections -->
       <ul class="nav nav-tabs" id="profileTabs">
         <li class="nav-item">
-          <a class="nav-link active" id="overview-tab" data-toggle="tab" href="#overview">Overview</a>
+          <a class="nav-link active text-light bg-dark" id="overview-tab" data-toggle="tab" href="#overview">Overview</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="skills-tab" data-toggle="tab" href="#skills">Skills</a>
+          <a class="nav-link text-light bg-dark" id="skills-tab" data-toggle="tab" href="#skills">Skills</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="research-tab" data-toggle="tab" href="#research">Research Info</a>
+          <a class="nav-link text-light bg-dark" id="research-tab" data-toggle="tab" href="#research">Research Info</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="ips-tab" data-toggle="tab" href="#published-ips">Published IPs</a>
+          <a class="nav-link text-light bg-dark" id="ips-tab" data-toggle="tab" href="#published-ips">Published IPs</a>
         </li>
       </ul>
 
@@ -42,27 +42,27 @@
       <div class="tab-content" id="profileTabsContent">
         <!-- Overview Section -->
         <div class="tab-pane fade show active" id="overview">
-          <h2 class="mt-4">Department: Cybersecurity and Forensics</h2>
+          <h2 class="mt-4 text-light">Department: Cybersecurity and Forensics</h2>
           <!-- List of IPs (Table Format) -->
-          <h3 class="mt-4">IPs Created</h3>
+          <h3 class="mt-4 text-light">IPs Created</h3>
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Category</th>
+                <th class="text-light">Title</th>
+                <th class="text-light">Category</th>
               </tr>
             </thead>
             <tbody>
               {% for ip in user.ips %}
               <tr>
-                <td>{{ ip.short_description }}</td>
-                <td>{{ ip.category }}</td>
+                <td class="text-light">{{ ip.short_description }}</td>
+                <td class="text-light">{{ ip.category }}</td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
           <!-- List of Notifications -->
-          <h3 class="mt-4">Notifications</h3>
+          <h3 class="mt-4 text-light">Notifications</h3>
           <div class="alert alert-info">
             You have 3 new notifications.
           </div>
@@ -70,18 +70,18 @@
 
         <!-- Skills Section -->
         <div class="tab-pane fade" id="skills">
-          <h2 class="mt-4">Skills</h2>
+          <h2 class="mt-4 text-light">Skills</h2>
           <ul class="list-group">
-            <li class="list-group-item">Programming: Python, JavaScript</li>
-            <li class="list-group-item">Data Analysis: SQL, Pandas</li>
-            <li class="list-group-item">Web Development: Flask, React</li>
+            <li class="list-group-item text-light bg-transparent border-white">Programming: Python, JavaScript</li>
+            <li class="list-group-item text-light bg-transparent border-white">Data Analysis: SQL, Pandas</li>
+            <li class="list-group-item text-light bg-transparent border-white">Web Development: Flask, React</li>
           </ul>
         </div>
 
         <!-- Research Info Section -->
         <div class="tab-pane fade" id="research">
-          <h2 class="mt-4">Research Info</h2>
-          <p>As a dedicated researcher, I have been exploring the fascinating world of artificial intelligence and its applications in healthcare.
+          <h2 class="mt-4 text-light">Research Info</h2>
+          <p class="text-light">As a dedicated researcher, I have been exploring the fascinating world of artificial intelligence and its applications in healthcare.
             My recent research focuses on leveraging machine learning algorithms to predict disease outbreaks based on epidemiological data.
             Through extensive data analysis and model development, I aim to contribute to early disease detection and prevention strategies.
             I am also passionate about natural language processing (NLP) and its potential to revolutionize the healthcare industry.</p>
@@ -89,17 +89,17 @@
 
         <!-- Published IPs Section -->
         <div class="tab-pane fade" id="published-ips">
-          <h2 class="mt-4">Published IPs</h2>
-          <div class="card">
+          <h2 class="mt-4 text-light">Published IPs</h2>
+          <div class="card bg-transparent border-white">
             <div class="card-body">
-              <h5 class="card-title">Invention: Smart Home Automation</h5>
-              <p class="card-text">Category: IoT</p>
+              <h5 class="card-title text-light">Invention: Smart Home Automation</h5>
+              <p class="card-text text-light">Category: IoT</p>
             </div>
           </div>
-          <div class="card mt-3">
+          <div class="card mt-3 bg-transparent border-white">
             <div class="card-body">
-              <h5 class="card-title">Software: Inventory Management System</h5>
-              <p class="card-text">Category: Business</p>
+              <h5 class="card-title text-light">Software: Inventory Management System</h5>
+              <p class="card-text text-light">Category: Business</p>
             </div>
           </div>
         </div>
@@ -108,4 +108,3 @@
   </div>
 </div>
 {% endblock %}
-

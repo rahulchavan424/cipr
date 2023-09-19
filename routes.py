@@ -77,16 +77,16 @@ def ip_create():
             flash('User email not found. Please log in.', 'error')
             return redirect(url_for('login'))
 
-        # Create a new IP instance and add it to the database
+        # create a new IP instance and add it to the database
         new_ip = IP(
             category=form.category.data,
             subcategory=form.subcategory.data,
             short_description=form.short_description.data,
             elaborate_description=form.elaborate_description.data,
-            user_email=user_email,  # Store the email address in the IP record
+            user_email=user_email,  # store the email address in the IP record
         )
 
-        # Handle file upload
+        # handle file upload
         attachments = []
         for file in request.files.getlist('attachments'):
             if file and allowed_file(file.filename):
@@ -117,18 +117,18 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
-            # Successful login
+            # successful login
             print("Successful login!")
             flash('Login successful!', 'success')
 
-            # Generate and store authentication token
+            # generate and store authentication token
             auth_token = user.generate_auth_token()
             session['auth_token'] = auth_token
             session['email'] = email
 
             return redirect(url_for('home'))
         else:
-            # Failed login
+            # failed login
             flash('Invalid email or password', 'error')
 
     return render_template('login.html', form=form)
@@ -181,10 +181,10 @@ def user_profile(email):
     if user:
         form = UserProfileForm()
         
-        # Handle the form submission and update the user's profile data
+        # handle the form submission and update the user's profile data
         user.description = form.description.data
         
-        # Handle profile picture upload
+        # handle profile picture upload
         if form.profile_picture.data:
             print("profile ke logic me aaya")
             profile_picture = form.profile_picture.data
@@ -194,14 +194,14 @@ def user_profile(email):
                 file_path = os.path.join(app.config['IMAGE_FOLDER'], filename)
                 profile_picture.save(file_path)
                 
-                # Save the file path to the user's profile_picture field in the database
+                # save the file path to the user's profile_picture field in the database
                 user.profile_picture = filename
 
             db.session.commit()
             flash('Profile updated successfully!', 'success')
             return redirect(url_for('user_profile', email=email))
 
-        # Pre-fill the form with the user's current profile data
+        # pre-fill the form with the user's current profile data
         form.description.data = user.description
 
         return render_template('user_profile.html', form=form, user=user)
