@@ -36,6 +36,12 @@ def home():
         user = User.query.filter_by(auth_token=auth_token).first()
 
         if user:
+            user_role = user.role
+            if user_role == 'Administrator':
+                users_to_approve = User.query.filter_by(approved=False).all()
+                ips_to_approve = IP.query.filter_by(approved=False).all()
+                print("ye hai users to approve wale", users_to_approve)
+
             category_choices = [(row.category, row.category) for row in db.session.query(IP.category).distinct()]
             category_choices.insert(0, ('', 'IP Category'))
             form.category.choices = category_choices
@@ -58,7 +64,10 @@ def home():
             # limit query results
             search_results = query.limit(5).all()
             
-            return render_template('home.html', form=form, ips=search_results)
+            if user_role == 'Administrator':
+                return render_template('home.html', form=form, ips=search_results, user_role=user_role, users_to_approve=users_to_approve, ips_to_approve=ips_to_approve)
+            else:
+                return render_template('home.html', form=form, ips=search_results, user_role=user_role)
 
     flash('You need to be logged in to access this page.', 'info')
     return redirect(url_for('login'))
@@ -70,7 +79,7 @@ def home():
 def ip_create():
     form = IPCreateForm()
     if form.validate_on_submit():
-        # Get the email address of the logged-in user from the session
+        # get the email address of the logged-in user from the session
         user_email = session.get('email')
 
         if not user_email:
@@ -83,7 +92,8 @@ def ip_create():
             subcategory=form.subcategory.data,
             short_description=form.short_description.data,
             elaborate_description=form.elaborate_description.data,
-            user_email=user_email,  # store the email address in the IP record
+            user_email=user_email,
+            approved=False
         )
 
         # handle file upload
@@ -117,16 +127,19 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
-            # successful login
-            print("Successful login!")
-            flash('Login successful!', 'success')
+            if user.approved:
+                # successful login
+                print("Successful login!")
+                flash('Login successful!', 'success')
 
-            # generate and store authentication token
-            auth_token = user.generate_auth_token()
-            session['auth_token'] = auth_token
-            session['email'] = email
+                # generate and store authentication token
+                auth_token = user.generate_auth_token()
+                session['auth_token'] = auth_token
+                session['email'] = email
 
-            return redirect(url_for('home'))
+                return redirect(url_for('home'))
+            else:
+                flash('Your account is pending approval by an administrator.', 'warning')
         else:
             # failed login
             flash('Invalid email or password', 'error')
@@ -156,17 +169,28 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
+        existing_user = User.query.filter_by(email=form.email.data).first()
         if existing_user:
-            flash('Username already exists. Please choose a different username.', 'danger')
+            flash('Email already exists. Please choose a different email.', 'danger')
             return redirect(url_for('register'))
         
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            role=form.role.data,
-            password=form.password.data
-        )
+        # check if the user's role is 'Administrator'
+        if form.role.data == 'Administrator':
+            new_user = User(
+                username=form.username.data,
+                email=form.email.data,
+                role=form.role.data,
+                password=form.password.data,
+                approved=True
+            )
+        else:
+            new_user = User(
+                username=form.username.data,
+                email=form.email.data,
+                role=form.role.data,
+                password=form.password.data,
+                approved=False
+            )
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! You can now log in.', 'success')
@@ -208,3 +232,33 @@ def user_profile(email):
     else:
         flash('User not found.', 'error')
         return redirect(url_for('home'))
+    
+@app.route('/admin/approve_user/<email>', methods=['POST'])
+@require_auth_token
+@require_role(UserRole.ADMINISTRATOR)
+def approve_user(email):
+    print("this is the email")
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.approved = True
+        db.session.commit()
+        flash(f'User "{user.email}" has been approved.', 'success')
+    else:
+        flash('User not found.', 'danger')
+    
+    return redirect(url_for('home'))
+
+@app.route('/admin/approve_ip/<email>', methods=['GET', 'POST'])
+@require_auth_token
+@require_role(UserRole.ADMINISTRATOR)
+def ip_approve(email):
+    print("this is the email")
+    ip = IP.query.filter_by(user_email=email).first()
+    if ip:
+        ip.approved = True
+        db.session.commit()
+        flash(f'User "{ip.user_email}" has been approved.', 'success')
+    else:
+        flash('User not found.', 'danger')
+    
+    return redirect(url_for('home'))

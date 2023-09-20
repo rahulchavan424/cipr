@@ -19,15 +19,17 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     registered_on = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     auth_token = db.Column(db.String(32), unique=True, nullable=True)
+    approved = db.Column(db.Boolean)
     profile_picture = db.Column(db.String(255))
     description = db.Column(db.Text)
     ips = relationship('IP', back_populates='user')
     
-    def __init__(self, username, email, role, password):
+    def __init__(self, username, email, role, password, approved):
         self.username = username
         self.email = email
         self.role = role
         self.password_hash = generate_password_hash(password)
+        self.approved = approved
     
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -46,4 +48,5 @@ class IP(db.Model):
     elaborate_description = db.Column(db.Text, nullable=False)
     attachments = db.Column(db.String(255))
     user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
+    approved = db.Column(db.Boolean, default=False)
     user = relationship('User', back_populates='ips')
