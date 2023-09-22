@@ -72,39 +72,89 @@
         <div class="tab-pane fade" id="skills">
           <h2 class="mt-4 text-light">Skills</h2>
           <ul class="list-group">
-            <li class="list-group-item text-light bg-transparent border-white">Programming: Python, JavaScript</li>
-            <li class="list-group-item text-light bg-transparent border-white">Data Analysis: SQL, Pandas</li>
-            <li class="list-group-item text-light bg-transparent border-white">Web Development: Flask, React</li>
+            {% if user.skills %}
+              {% set skills_array = user.skills.split() %}
+              {% for skill in skills_array %}
+                <li class="list-group-item text-light bg-transparent border-white">
+                  {{ skill }}
+                  <a href="{{ url_for('remove_skill', email=user.email, skill=skill) }}" class="btn btn-outline-light btn-sm float-right">Remove</a>
+                </li>
+              {% endfor %}
+            {% else %}
+              <li class="list-group-item text-light bg-transparent border-white">
+                No skills added
+              </li>
+            {% endif %}
           </ul>
+          <form method="POST" action="{{ url_for('add_skill', email=user.email) }}" class="mt-3">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              <label for="{{ form.skill.id }}" class="text-light">Add Skill:</label>
+              {{ form.skill(class="form-control") }}
+            </div>
+            <button type="submit" class="btn btn-outline-light">Add Skill</button>
+          </form>
         </div>
 
         <!-- Research Info Section -->
         <div class="tab-pane fade" id="research">
           <h2 class="mt-4 text-light">Research Info</h2>
-          <p class="text-light">As a dedicated researcher, I have been exploring the fascinating world of artificial intelligence and its applications in healthcare.
-            My recent research focuses on leveraging machine learning algorithms to predict disease outbreaks based on epidemiological data.
-            Through extensive data analysis and model development, I aim to contribute to early disease detection and prevention strategies.
-            I am also passionate about natural language processing (NLP) and its potential to revolutionize the healthcare industry.</p>
+          <div id="research-display">
+            <p>{{ user.research_info }}</p>
+          </div>
+          <button id="edit-research-btn" class="btn btn-outline-light mt-2">Edit</button>
+          <form id="research-edit-form" method="POST" action="{{ url_for('edit_research_info', email=user.email) }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              <textarea name="research_info" class="form-control" rows="6">{{ user.research_info }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-outline-light">Save</button>
+          </form>
         </div>
+
+
 
         <!-- Published IPs Section -->
         <div class="tab-pane fade" id="published-ips">
           <h2 class="mt-4 text-light">Published IPs</h2>
-          <div class="card bg-transparent border-white">
-            <div class="card-body">
-              <h5 class="card-title text-light">Invention: Smart Home Automation</h5>
-              <p class="card-text text-light">Category: IoT</p>
-            </div>
-          </div>
-          <div class="card mt-3 bg-transparent border-white">
-            <div class="card-body">
-              <h5 class="card-title text-light">Software: Inventory Management System</h5>
-              <p class="card-text text-light">Category: Business</p>
-            </div>
-          </div>
+          {% if user.ips %}
+            {% for ip in user.ips if ip.approved %}
+              <div class="card bg-transparent border-white">
+                <div class="card-body">
+                  <h5 class="card-title text-light">{{ ip.short_description }}</h5>
+                  <p class="card-text text-light">Category: {{ ip.category }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-light">No approved IPs found.</p>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  // Function to toggle the visibility of the edit form and display box
+  function toggleEditResearch() {
+    const displayBox = document.getElementById('research-display');
+    const editForm = document.getElementById('research-edit-form');
+    const editButton = document.getElementById('edit-research-btn');
+
+    if (displayBox.style.display === 'none') {
+      displayBox.style.display = 'block';
+      editForm.style.display = 'none';
+      editButton.textContent = 'Edit';
+    } else {
+      displayBox.style.display = 'none';
+      editForm.style.display = 'block';
+      editButton.textContent = 'Cancel';
+    }
+  }
+
+  // Add a click event listener to the "Edit" button
+  const editButton = document.getElementById('edit-research-btn');
+  editButton.addEventListener('click', toggleEditResearch);
+</script>
 {% endblock %}

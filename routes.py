@@ -41,12 +41,13 @@ def home():
                 users_to_approve = User.query.filter_by(approved=False).all()
                 ips_to_approve = IP.query.filter_by(approved=False).all()
                 print("ye hai users to approve wale", users_to_approve)
+                print("ye hai ips to approve wale", ips_to_approve)
 
             category_choices = [(row.category, row.category) for row in db.session.query(IP.category).distinct()]
             category_choices.insert(0, ('', 'IP Category'))
             form.category.choices = category_choices
 
-            query = IP.query.order_by(desc(IP.id)) 
+            query = IP.query.filter_by(approved=True).order_by(desc(IP.id)) 
 
             category = form.category.data
             if category and category != '':
@@ -204,10 +205,7 @@ def user_profile(email):
     user = User.query.filter_by(email=email).first()
     if user:
         form = UserProfileForm()
-        
-        # handle the form submission and update the user's profile data
-        user.description = form.description.data
-        
+
         # handle profile picture upload
         if form.profile_picture.data:
             print("profile ke logic me aaya")
@@ -226,7 +224,7 @@ def user_profile(email):
             return redirect(url_for('user_profile', email=email))
 
         # pre-fill the form with the user's current profile data
-        form.description.data = user.description
+        form.research_info.data = user.research_info
 
         return render_template('user_profile.html', form=form, user=user)
     else:
@@ -253,7 +251,8 @@ def approve_user(email):
 @require_role(UserRole.ADMINISTRATOR)
 def ip_approve(email):
     print("this is the email")
-    ip = IP.query.filter_by(user_email=email).first()
+    ip = IP.query.filter_by(user_email=email, approved=False).first()
+    print("ye hai ip jo baki hai", ip)
     if ip:
         ip.approved = True
         db.session.commit()
@@ -262,3 +261,61 @@ def ip_approve(email):
         flash('User not found.', 'danger')
     
     return redirect(url_for('home'))
+
+@app.route('/add_skill/<email>', methods=['POST'])
+@require_auth_token
+def add_skill(email):
+    user = User.query.filter_by(email=email).first()
+    if user:
+        new_skill = request.form.get('skill')
+        if new_skill:
+            if user.skills is None:
+                user.skills = []
+            user.skills = user.skills.split()
+            print("ye honi chaiyye skills ki list", user.skills)
+            user.skills.append(new_skill)
+            user.skills = " ".join(user.skills)
+            print("ye hai user ke skills" ,user.skills)
+            db.session.commit()
+            flash(f'Skill "{new_skill}" added successfully!', 'success')
+        else:
+            flash('Invalid skill name.', 'danger')
+    else:
+        flash('User not found.', 'danger')
+    return redirect(url_for('user_profile', email=email))
+
+@app.route('/remove_skill/<email>/<skill>', methods=['GET'])
+@require_auth_token
+def remove_skill(email, skill):
+    user = User.query.filter_by(email=email).first()
+    if user:
+        if user.skills:
+            skills_list = user.skills.split()
+            if skill in skills_list:
+                skills_list.remove(skill)
+                user.skills = " ".join(skills_list)
+                db.session.commit()
+                flash(f'Skill "{skill}" removed successfully!', 'success')
+            else:
+                flash(f'Skill "{skill}" not found in user skills.', 'danger')
+        else:
+            flash('User has no skills to remove.', 'danger')
+    else:
+        flash('User not found.', 'danger')
+    return redirect(url_for('user_profile', email=email))
+
+@app.route('/edit_research_info/<email>', methods=['POST'])
+@require_auth_token
+def edit_research_info(email):
+    user = User.query.filter_by(email=email).first()
+    if user:
+        new_research_info = request.form.get('research_info')
+        if new_research_info is not None:
+            user.research_info = new_research_info
+            db.session.commit()
+            flash('Research info updated successfully!', 'success')
+        else:
+            flash('Invalid research info.', 'danger')
+    else:
+        flash('User not found.', 'danger')
+    return redirect(url_for('user_profile', email=email))

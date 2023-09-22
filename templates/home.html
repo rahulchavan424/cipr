@@ -34,7 +34,7 @@
         <div class="row mt-4">
             <div class="col">
                 <table class="table table-bordered table-striped text-light">
-                    <thead class="thead-dark">
+                    <thead class="thead-light">
                         <tr>
                             <th>Category</th>
                             <th>Subcategory</th>
@@ -69,7 +69,7 @@
                 <div class="col-md-12">
                     <h2 class="display-5">User Approval</h2>
                     <table class="table table-bordered table-striped text-light">
-                        <thead class="thead-dark">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Username</th>
                                 <th>Email</th>
@@ -107,13 +107,11 @@
                 <div class="col-md-12">
                     <h2 class="display-5">IP Approval</h2>
                     <table class="table table-bordered table-striped text-light">
-                        <thead class="thead-dark">
+                        <thead class="thead-light">
                             <tr>
                                 <th>Category</th>
                                 <th>Subcategory</th>
                                 <th>Short Description</th>
-                                <th>Elaborate Description</th>
-                                <th>Attachments</th>
                                 <th>User Email</th>
                                 <th>Action</th>
                             </tr>
@@ -124,9 +122,9 @@
                                     <tr>
                                         <td>{{ ip.category }}</td>
                                         <td>{{ ip.subcategory }}</td>
-                                        <td>{{ ip.short_description }}</td>
-                                        <td>{{ ip.elaborate_description }}</td>
-                                        <td>{{ ip.attachments }}</td>
+                                        <td>
+                                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}" class="text-light">{{ ip.short_description }}</a>
+                                        </td>
                                         <td>{{ ip.user_email }}</td>
                                         <td>
                                             <form method="POST" action="{{ url_for('ip_approve', email=ip.user_email) }}">
@@ -137,7 +135,7 @@
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="7" class="text-center">No IPs to approve.</td>
+                                    <td colspan="5" class="text-center">No IPs to approve.</td>
                                 </tr>
                             {% endif %}
                         </tbody>

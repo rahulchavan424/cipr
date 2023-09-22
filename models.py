@@ -21,7 +21,8 @@ class User(db.Model):
     auth_token = db.Column(db.String(32), unique=True, nullable=True)
     approved = db.Column(db.Boolean)
     profile_picture = db.Column(db.String(255))
-    description = db.Column(db.Text)
+    skills = db.Column(db.String(255), nullable=True)
+    research_info = db.Column(db.Text, nullable=True)
     ips = relationship('IP', back_populates='user')
     
     def __init__(self, username, email, role, password, approved):

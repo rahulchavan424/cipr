@@ -40,5 +40,6 @@ class UserProfileForm(FlaskForm):
     profile_picture = FileField('Profile Picture', validators=[
         FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Images only!'),
     ])
-    description = TextAreaField('Description', validators=[DataRequired()])
+    skill = StringField('Skill')
+    research_info = TextAreaField('Research Info')
     submit = SubmitField('Save Profile')
