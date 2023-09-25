@@ -24,6 +24,8 @@ class User(db.Model):
     skills = db.Column(db.String(255), nullable=True)
     research_info = db.Column(db.Text, nullable=True)
     ips = relationship('IP', back_populates='user')
+    comments = db.relationship('Comment', back_populates='user')
+    notifications = db.relationship('Notification', back_populates='user')
     
     def __init__(self, username, email, role, password, approved):
         self.username = username
@@ -51,3 +53,19 @@ class IP(db.Model):
     user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
     approved = db.Column(db.Boolean, default=False)
     user = relationship('User', back_populates='ips')
+    comments = db.relationship('Comment', back_populates='ip')
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
+    ip_id = db.Column(db.Integer, db.ForeignKey('ip.id'))
+    user = db.relationship('User', back_populates='comments')
+    ip = db.relationship('IP', back_populates='comments')
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    viewed = db.Column(db.Boolean, default=False)
+    user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
+    user = db.relationship('User', back_populates='notifications')

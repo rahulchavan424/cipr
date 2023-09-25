@@ -1,7 +1,7 @@
 from flask import render_template, url_for, redirect, flash, request, session, jsonify
 from app import app, db
-from forms import IPCreateForm, IPSearchForm, RegistrationForm, LoginForm, UserProfileForm
-from models import User, IP
+from forms import IPCreateForm, IPSearchForm, RegistrationForm, LoginForm, UserProfileForm, CommentForm
+from models import User, IP, Comment, Notification
 from auth import require_auth_token, require_role
 from roles import UserRole
 import os
@@ -113,10 +113,28 @@ def ip_create():
 
     return render_template('ip_create.html', form=form)
 
-@app.route('/ip/<int:ip_id>')
+@app.route('/ip_detail/<int:ip_id>', methods=['GET', 'POST'])
 def ip_detail(ip_id):
+    # retrieve the IP object based on the 'ip_id' parameter
     ip = IP.query.get(ip_id)
-    return render_template('ip_detail.html', ip=ip)
+    user_email = session.get('email')
+    # create an instance of the CommentForm
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        comment_text = form.comment_text.data
+
+        # create a new comment
+        comment = Comment(text=comment_text, user_email=user_email, ip=ip)
+
+        db.session.add(comment)
+        db.session.commit()
+
+        flash('Comment added successfully!', 'success')
+        return redirect(url_for('ip_detail', ip_id=ip_id))
+
+    return render_template('ip_detail.html', ip=ip, form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -204,6 +222,14 @@ def register():
 def user_profile(email):
     user = User.query.filter_by(email=email).first()
     if user:
+        # fetch the number of new notifications and mark them as viewed
+        new_notifications = Notification.query.filter_by(user=user, viewed=False).all()
+        print("ye hai naye wale notifications", new_notifications)
+        for notification in new_notifications:
+            notification.viewed = True
+        db.session.commit()
+        new_notifications_count = len(new_notifications)
+
         form = UserProfileForm()
 
         # handle profile picture upload
@@ -226,7 +252,7 @@ def user_profile(email):
         # pre-fill the form with the user's current profile data
         form.research_info.data = user.research_info
 
-        return render_template('user_profile.html', form=form, user=user)
+        return render_template('user_profile.html', form=form, user=user, notifications=user.notifications, new_notifications_count=new_notifications_count)
     else:
         flash('User not found.', 'error')
         return redirect(url_for('home'))
@@ -319,3 +345,26 @@ def edit_research_info(email):
     else:
         flash('User not found.', 'danger')
     return redirect(url_for('user_profile', email=email))
+
+@app.route('/add_comment/<ip_id>', methods=['POST'])
+@require_auth_token
+def add_comment(ip_id):
+    user_email = session.get('email')
+    ip = IP.query.get(ip_id)
+    if user_email and ip:
+        new_comment_text = request.form.get('comment_text')
+        if new_comment_text:
+            comment = Comment(text=new_comment_text, user_email=user_email, ip=ip)
+            db.session.add(comment)
+            db.session.commit()
+            # create a notification for the IP owner
+            notification_text = f'New comment on your IP: {ip.short_description}'
+            notification = Notification(text=notification_text, user=ip.user)
+            db.session.add(notification)
+            db.session.commit()
+            flash('Comment added successfully!', 'success')
+        else:
+            flash('Invalid comment.', 'danger')
+    else:
+        flash('User or IP not found.', 'danger')
+    return redirect(url_for('ip_detail', ip_id=ip_id))  

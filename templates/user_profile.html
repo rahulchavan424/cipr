@@ -63,8 +63,19 @@
           </table>
           <!-- List of Notifications -->
           <h3 class="mt-4 text-light">Notifications</h3>
-          <div class="alert alert-info">
-            You have 3 new notifications.
+          <div class="alert alert-dark">
+            {% if new_notifications_count > 0 %}
+              <a href="#" id="toggle-notifications">You have {{ new_notifications_count }} new notifications.</a>
+            {% else %}
+              You have no new notifications.
+            {% endif %}
+          </div>
+          <div id="notifications" style="display: none;">
+            <ul class="mt-4 text-light">
+              {% for notification in notifications %}
+                <li>{{ notification.text }}</li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
 
@@ -112,8 +123,6 @@
           </form>
         </div>
 
-
-
         <!-- Published IPs Section -->
         <div class="tab-pane fade" id="published-ips">
           <h2 class="mt-4 text-light">Published IPs</h2>
@@ -156,5 +165,18 @@
   // Add a click event listener to the "Edit" button
   const editButton = document.getElementById('edit-research-btn');
   editButton.addEventListener('click', toggleEditResearch);
+
+  // Function to toggle the visibility of notifications
+  function toggleNotifications() {
+    const notifications = document.getElementById('notifications');
+    notifications.style.display = (notifications.style.display === 'none') ? 'block' : 'none';
+  }
+
+  // Add a click event listener to the "Click here to view" link
+  const toggleLink = document.getElementById('toggle-notifications');
+  if (toggleLink) {
+    toggleLink.addEventListener('click', toggleNotifications);
+  }
+
 </script>
 {% endblock %}

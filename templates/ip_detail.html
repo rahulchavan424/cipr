@@ -17,6 +17,40 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                <h2 class="h4 text-light">Comments</h2>
+                <div class="card mt-3 bg-transparent text-light">
+                    <div class="card-body">
+                        <ul>
+                            {% if ip.comments %}
+                            {% for comment in ip.comments %}
+                                <li>{{ comment.text }}</li>
+                            {% endfor %}
+                            {% else %}
+                                <li>No comments.</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h2 class="h4 text-light">Add comment</h2>
+                <div class="card mt-3 bg-transparent text-light">
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('add_comment', ip_id=ip.id) }}">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group">
+                              <textarea name="comment_text" class="form-control" rows="4" placeholder="Add a comment"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-outline-light">Add Comment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

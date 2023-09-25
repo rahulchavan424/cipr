@@ -43,3 +43,7 @@ class UserProfileForm(FlaskForm):
     skill = StringField('Skill')
     research_info = TextAreaField('Research Info')
     submit = SubmitField('Save Profile')
+
+class CommentForm(FlaskForm):
+    comment_text = TextAreaField('Comment', validators=[DataRequired()])
+    submit = SubmitField('Add Comment')
