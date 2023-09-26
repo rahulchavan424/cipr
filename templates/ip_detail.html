@@ -12,7 +12,14 @@
                         <p><strong>Subcategory:</strong> {{ ip.subcategory }}</p>
                         <p><strong>Short Description:</strong> {{ ip.short_description }}</p>
                         <p><strong>Elaborate Description:</strong> {{ ip.elaborate_description }}</p>
-                        <p><strong>Attachments:</strong> {{ ip.attachments }}</p>
+                        <p><strong>Attachments:</strong></p>
+                        <ul>
+                            {% if ip.attachments %}
+                                <li><a href="{{ url_for('download_attachment', ip_id=ip.id, attachment_index=0) }}" target="_blank">Attachment 1</a></li>
+                            {% else %}
+                                <li>No attachments.</li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -24,9 +31,9 @@
                     <div class="card-body">
                         <ul>
                             {% if ip.comments %}
-                            {% for comment in ip.comments %}
-                                <li>{{ comment.text }}</li>
-                            {% endfor %}
+                                {% for comment in ip.comments %}
+                                    <li>{{ comment.text }}</li>
+                                {% endfor %}
                             {% else %}
                                 <li>No comments.</li>
                             {% endif %}
@@ -43,7 +50,7 @@
                         <form method="POST" action="{{ url_for('add_comment', ip_id=ip.id) }}">
                             {{ form.hidden_tag() }}
                             <div class="form-group">
-                              <textarea name="comment_text" class="form-control" rows="4" placeholder="Add a comment"></textarea>
+                                <textarea name="comment_text" class="form-control" rows="4" placeholder="Add a comment"></textarea>
                             </div>
                             <button type="submit" class="btn btn-outline-light">Add Comment</button>
                         </form>
@@ -53,4 +60,3 @@
         </div>
     </div>
 {% endblock %}
-

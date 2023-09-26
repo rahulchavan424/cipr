@@ -55,7 +55,8 @@
             <tbody>
               {% for ip in user.ips %}
               <tr>
-                <td class="text-light">{{ ip.short_description }}</td>
+                <td class="text-light">
+                  {{ ip.short_description }}</td>
                 <td class="text-light">{{ ip.category }}</td>
               </tr>
               {% endfor %}

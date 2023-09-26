@@ -1,10 +1,10 @@
-from flask import render_template, url_for, redirect, flash, request, session, jsonify
+from flask import render_template, url_for, redirect, flash, request, session, jsonify, send_file, abort
 from app import app, db
 from forms import IPCreateForm, IPSearchForm, RegistrationForm, LoginForm, UserProfileForm, CommentForm
 from models import User, IP, Comment, Notification
 from auth import require_auth_token, require_role
 from roles import UserRole
-import os
+import os, pickle, io, json ,base64
 from werkzeug.utils import secure_filename
 from sqlalchemy import desc
 
@@ -97,14 +97,24 @@ def ip_create():
             approved=False
         )
 
-        # handle file upload
+        # Handle file upload and store attachments in the database as binary data
         attachments = []
+        attachment_filenames = []
+        attachment_mimetypes = []
         for file in request.files.getlist('attachments'):
             if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                attachments.append(filename)
-        new_ip.attachments = ', '.join(attachments)
+                # Read the file content as binary data
+                file_data = file.read()
+                attachments.append(file_data)
+                attachment_filenames.append(file.filename)
+                attachment_mimetypes.append(file.mimetype)
+
+        # Store the binary data in the 'attachments' column
+        new_ip.attachments = b'\x00'.join(attachments)  # Join binary data with a null byte separator
+
+        # Store attachment filenames and mimetypes as JSON-encoded strings
+        new_ip.attachment_filenames = json.dumps(attachment_filenames)
+        new_ip.attachment_mimetypes = json.dumps(attachment_mimetypes)
 
         db.session.add(new_ip)
         db.session.commit()
@@ -296,7 +306,7 @@ def add_skill(email):
         new_skill = request.form.get('skill')
         if new_skill:
             if user.skills is None:
-                user.skills = []
+                user.skills = ""
             user.skills = user.skills.split()
             print("ye honi chaiyye skills ki list", user.skills)
             user.skills.append(new_skill)
@@ -367,4 +377,52 @@ def add_comment(ip_id):
             flash('Invalid comment.', 'danger')
     else:
         flash('User or IP not found.', 'danger')
-    return redirect(url_for('ip_detail', ip_id=ip_id))  
+    return redirect(url_for('ip_detail', ip_id=ip_id))
+
+@app.route('/ip/download_attachment/<int:ip_id>/<int:attachment_index>', methods=['GET'])
+def download_attachment(ip_id, attachment_index):
+    # Retrieve the IP object based on the ip_id
+    ip = IP.query.get(ip_id)
+
+    if ip is None:
+        # IP not found, return a 404 Not Found response
+        abort(404)
+
+    # Deserialize the attachment filenames and mimetypes using json.loads
+    attachment_filenames = json.loads(ip.attachment_filenames)
+    attachment_mimetypes = json.loads(ip.attachment_mimetypes)
+
+    if (
+        attachment_index < 0
+        or attachment_index >= len(attachment_filenames)
+        or attachment_index >= len(attachment_mimetypes)
+    ):
+        # Invalid attachment index, return a 404 Not Found response
+        abort(404)
+
+    # Get the selected attachment filename and mimetype
+    filename = attachment_filenames[attachment_index]
+    mimetype = attachment_mimetypes[attachment_index]
+
+    # Retrieve the binary attachment data from the 'attachments' column
+    attachments = ip.attachments.split(b'\x00')  # Split binary data using the null byte separator
+
+    if (
+        attachment_index < 0
+        or attachment_index >= len(attachments)
+    ):
+        # Invalid attachment index, return a 404 Not Found response
+        abort(404)
+
+    # Get the selected attachment data
+    attachment_data = attachments[attachment_index]
+
+    # Create a response to serve the attachment as a file download with the original filename and mimetype
+    response = send_file(
+        io.BytesIO(attachment_data),
+        as_attachment=True,
+        download_name=filename,
+        mimetype=mimetype
+    )
+
+    return response
