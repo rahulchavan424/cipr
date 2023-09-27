@@ -53,7 +53,9 @@ class IP(db.Model):
     attachment_filenames = db.Column(db.String(255), nullable=True)
     attachment_mimetypes = db.Column(db.String(255))
     user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
-    approved = db.Column(db.Boolean, default=False)
+    approved_admin = db.Column(db.Boolean, default=False)
+    approved_reviewer = db.Column(db.Boolean, default=False)
+    approved_verifier = db.Column(db.Boolean, default=False)
     user = relationship('User', back_populates='ips')
     comments = db.relationship('Comment', back_populates='ip')
 

@@ -128,7 +128,7 @@
         <div class="tab-pane fade" id="published-ips">
           <h2 class="mt-4 text-light">Published IPs</h2>
           {% if user.ips %}
-            {% for ip in user.ips if ip.approved %}
+            {% for ip in user.ips if ip.approved_admin %}
               <div class="card bg-transparent border-white">
                 <div class="card-body">
                   <h5 class="card-title text-light">{{ ip.short_description }}</h5>

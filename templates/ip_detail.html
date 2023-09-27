@@ -14,8 +14,10 @@
                         <p><strong>Elaborate Description:</strong> {{ ip.elaborate_description }}</p>
                         <p><strong>Attachments:</strong></p>
                         <ul>
-                            {% if ip.attachments %}
-                                <li><a href="{{ url_for('download_attachment', ip_id=ip.id, attachment_index=0) }}" target="_blank">Attachment 1</a></li>
+                            {% if attachments %}
+                                {% for filename, mimetype in attachments %}
+                                    <li><a href="{{ url_for('download_attachment', ip_id=ip.id, attachment_filename=filename) }}" target="_blank">{{ filename }}</a> ({{ mimetype }})</li>
+                                {% endfor %}
                             {% else %}
                                 <li>No attachments.</li>
                             {% endif %}

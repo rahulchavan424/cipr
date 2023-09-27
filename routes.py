@@ -39,15 +39,20 @@ def home():
             user_role = user.role
             if user_role == 'Administrator':
                 users_to_approve = User.query.filter_by(approved=False).all()
-                ips_to_approve = IP.query.filter_by(approved=False).all()
-                print("ye hai users to approve wale", users_to_approve)
-                print("ye hai ips to approve wale", ips_to_approve)
+                ips_to_approve = IP.query.filter_by(approved_admin=False, approved_reviewer=True, approved_verifier=True).all()
+            if user_role == 'Reviewer':
+                users_to_approve = User.query.filter_by(approved=False).all()
+                ips_to_approve = IP.query.filter_by(approved_reviewer=False, approved_verifier=True).all()
+            if user_role == 'Verifier':
+                users_to_approve = User.query.filter_by(approved=False).all()
+                ips_to_approve = IP.query.filter_by(approved_verifier=False).all()
+                print("ye hai ips to approve by verifier", ips_to_approve)
 
             category_choices = [(row.category, row.category) for row in db.session.query(IP.category).distinct()]
             category_choices.insert(0, ('', 'IP Category'))
             form.category.choices = category_choices
 
-            query = IP.query.filter_by(approved=True).order_by(desc(IP.id)) 
+            query = IP.query.filter_by(approved_admin=True).order_by(desc(IP.id)) 
 
             category = form.category.data
             if category and category != '':
@@ -67,6 +72,10 @@ def home():
             
             if user_role == 'Administrator':
                 return render_template('home.html', form=form, ips=search_results, user_role=user_role, users_to_approve=users_to_approve, ips_to_approve=ips_to_approve)
+            elif user_role == 'Reviewer':
+                return render_template('home.html', form=form, ips=search_results, user_role=user_role, ips_to_approve=ips_to_approve)
+            elif user_role == 'Verifier':
+                return render_template('home.html', form=form, ips=search_results, user_role=user_role, ips_to_approve=ips_to_approve)
             else:
                 return render_template('home.html', form=form, ips=search_results, user_role=user_role)
 
@@ -94,7 +103,9 @@ def ip_create():
             short_description=form.short_description.data,
             elaborate_description=form.elaborate_description.data,
             user_email=user_email,
-            approved=False
+            approved_admin=False,
+            approved_reviewer=False,
+            approved_verifier=False
         )
 
         # Handle file upload and store attachments in the database as binary data
@@ -143,7 +154,15 @@ def ip_detail(ip_id):
         flash('Comment added successfully!', 'success')
         return redirect(url_for('ip_detail', ip_id=ip_id))
 
-    return render_template('ip_detail.html', ip=ip, form=form)
+    # Retrieve attachment filenames and mimetypes
+    attachment_filenames = json.loads(ip.attachment_filenames)
+    attachment_mimetypes = json.loads(ip.attachment_mimetypes)
+
+    # Create a list of attachments with filenames and mimetypes
+    attachments = zip(attachment_filenames, attachment_mimetypes)
+
+    return render_template('ip_detail.html', ip=ip, form=form, attachments=attachments)
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -285,12 +304,44 @@ def approve_user(email):
 @app.route('/admin/approve_ip/<email>', methods=['GET', 'POST'])
 @require_auth_token
 @require_role(UserRole.ADMINISTRATOR)
-def ip_approve(email):
+def ip_approve_admin(email):
     print("this is the email")
-    ip = IP.query.filter_by(user_email=email, approved=False).first()
+    ip = IP.query.filter_by(user_email=email, approved_admin=False, approved_reviewer=True, approved_verifier=True).first()
     print("ye hai ip jo baki hai", ip)
     if ip:
-        ip.approved = True
+        ip.approved_admin = True
+        db.session.commit()
+        flash(f'User "{ip.user_email}" has been approved.', 'success')
+    else:
+        flash('User not found.', 'danger')
+    
+    return redirect(url_for('home'))
+
+@app.route('/reviewer/approve_ip/<email>', methods=['GET', 'POST'])
+@require_auth_token
+@require_role(UserRole.REVIEWER)
+def ip_approve_reviewer(email):
+    print("this is the email")
+    ip = IP.query.filter_by(user_email=email, approved_reviewer=False, approved_verifier=True).first()
+    print("ye hai ip jo baki hai", ip)
+    if ip:
+        ip.approved_reviewer = True
+        db.session.commit()
+        flash(f'User "{ip.user_email}" has been approved.', 'success')
+    else:
+        flash('User not found.', 'danger')
+    
+    return redirect(url_for('home'))
+
+@app.route('/verifier/approve_ip/<email>', methods=['GET', 'POST'])
+@require_auth_token
+@require_role(UserRole.VERIFIER)
+def ip_approve_verifier(email):
+    print("this is the email")
+    ip = IP.query.filter_by(user_email=email, approved_verifier=False).first()
+    print("ye hai ip jo baki hai", ip)
+    if ip:
+        ip.approved_verifier = True
         db.session.commit()
         flash(f'User "{ip.user_email}" has been approved.', 'success')
     else:
@@ -379,8 +430,8 @@ def add_comment(ip_id):
         flash('User or IP not found.', 'danger')
     return redirect(url_for('ip_detail', ip_id=ip_id))
 
-@app.route('/ip/download_attachment/<int:ip_id>/<int:attachment_index>', methods=['GET'])
-def download_attachment(ip_id, attachment_index):
+@app.route('/ip/download_attachment/<int:ip_id>/<attachment_filename>', methods=['GET'])
+def download_attachment(ip_id, attachment_filename):
     # Retrieve the IP object based on the ip_id
     ip = IP.query.get(ip_id)
 
@@ -392,16 +443,14 @@ def download_attachment(ip_id, attachment_index):
     attachment_filenames = json.loads(ip.attachment_filenames)
     attachment_mimetypes = json.loads(ip.attachment_mimetypes)
 
-    if (
-        attachment_index < 0
-        or attachment_index >= len(attachment_filenames)
-        or attachment_index >= len(attachment_mimetypes)
-    ):
-        # Invalid attachment index, return a 404 Not Found response
+    # Find the index of the selected attachment
+    try:
+        attachment_index = attachment_filenames.index(attachment_filename)
+    except ValueError:
+        # Attachment filename not found, return a 404 Not Found response
         abort(404)
 
     # Get the selected attachment filename and mimetype
-    filename = attachment_filenames[attachment_index]
     mimetype = attachment_mimetypes[attachment_index]
 
     # Retrieve the binary attachment data from the 'attachments' column
@@ -421,7 +470,7 @@ def download_attachment(ip_id, attachment_index):
     response = send_file(
         io.BytesIO(attachment_data),
         as_attachment=True,
-        download_name=filename,
+        download_name=attachment_filename,
         mimetype=mimetype
     )
 

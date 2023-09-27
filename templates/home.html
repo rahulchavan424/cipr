@@ -127,7 +127,89 @@
                                         </td>
                                         <td>{{ ip.user_email }}</td>
                                         <td>
-                                            <form method="POST" action="{{ url_for('ip_approve', email=ip.user_email) }}">
+                                            <form method="POST" action="{{ url_for('ip_approve_admin', email=ip.user_email) }}">
+                                                <button type="submit" class="btn btn-outline-light">Approve</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No IPs to approve.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+        {% if user_role == 'Reviewer' %}
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h2 class="display-5">IP Approval</h2>
+                    <table class="table table-bordered table-striped text-light">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Category</th>
+                                <th>Subcategory</th>
+                                <th>Short Description</th>
+                                <th>User Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if ips_to_approve %}
+                                {% for ip in ips_to_approve %}
+                                    <tr>
+                                        <td>{{ ip.category }}</td>
+                                        <td>{{ ip.subcategory }}</td>
+                                        <td>
+                                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}" class="text-light">{{ ip.short_description }}</a>
+                                        </td>
+                                        <td>{{ ip.user_email }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ url_for('ip_approve_reviewer', email=ip.user_email) }}">
+                                                <button type="submit" class="btn btn-outline-light">Approve</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No IPs to approve.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+        {% if user_role == 'Verifier' %}
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h2 class="display-5">IP Approval</h2>
+                    <table class="table table-bordered table-striped text-light">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Category</th>
+                                <th>Subcategory</th>
+                                <th>Short Description</th>
+                                <th>User Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if ips_to_approve %}
+                                {% for ip in ips_to_approve %}
+                                    <tr>
+                                        <td>{{ ip.category }}</td>
+                                        <td>{{ ip.subcategory }}</td>
+                                        <td>
+                                            <a href="{{ url_for('ip_detail', ip_id=ip.id) }}" class="text-light">{{ ip.short_description }}</a>
+                                        </td>
+                                        <td>{{ ip.user_email }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ url_for('ip_approve_verifier', email=ip.user_email) }}">
                                                 <button type="submit" class="btn btn-outline-light">Approve</button>
                                             </form>
                                         </td>
