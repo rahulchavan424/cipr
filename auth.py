@@ -1,6 +1,7 @@
 from flask import redirect, url_for, session, flash
 from models import User
 from functools import wraps
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # authentication logic
 def require_auth_token(view_func):
@@ -25,6 +26,22 @@ def require_role(role_required):
                 user = User.query.filter_by(auth_token=auth_token).first()
                 if user and user.role == role_required:
                     return func(*args, **kwargs)
+            flash('Access denied. You do not have the required role.', 'error')
+            return redirect(url_for('home'))
+        return wrapper
+    return decorator
+
+# jwt authorization
+def require_role_jwt(role_required):
+    def decorator(func):
+        @wraps(func)
+        @jwt_required()
+        def wrapper(*args, **kwargs):
+            current_user_email = get_jwt_identity()
+            print("ye hai jwt identity", current_user_email)
+            user = User.query.filter_by(email=current_user_email).first()
+            if user and user.role == role_required:
+                return func(*args, **kwargs)
             flash('Access denied. You do not have the required role.', 'error')
             return redirect(url_for('home'))
         return wrapper
